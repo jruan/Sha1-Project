@@ -12,7 +12,8 @@ module SHA1_finish(
 
 input clk;
 input [1:0] state;
-/*input [31:0] in_h0;
+/*
+input [31:0] in_h0;
 input [31:0] in_h1;
 input [31:0] in_h2;
 input [31:0] in_h3;

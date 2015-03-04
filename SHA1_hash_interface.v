@@ -53,42 +53,34 @@ output  port_A_we;
 output	done; // done is a signal to indicate that hash  is complete
 
 wire compute_en;
-/*wire [31:0] old_h0 = 32'h67452301;
-wire [31:0] old_h1 = 32'hEFCDAB89;
-wire [31:0] old_h2 = 32'h98BADCFE;
-wire [31:0] old_h3 = 32'h10325476;
-wire [31:0] old_h4 = 32'hC3D2E1F0; 
-*/
-wire [31:0] new_h0;
-wire [31:0] new_h1;
-wire [31:0] new_h2;
-wire [31:0] new_h3;
-wire [31:0] new_h4;
+
+wire [31:0] sec_part;
 
 wire [31:0] padding_length;
 wire finish;
 
 wire [1:0] state;
 wire [7:0] round;
+wire p2_enable;
 
 wire [31:0] output_data;
+wire [7:0] output_round;
 
-//assign done = finish;
+assign done = finish;
 
 
 //state controller controls what state we are in
 SHA1_state_controller state_controller(
 					 .nreset(nreset), 
 					 .start_hash(start_hash),
-					 .done(finish),
 					 .state(state)
 					 );
 
 //at the initial state stage, we will calculate the padding length that will be use later
+
 SHA1_initial_state initial_state(
 				 .clk(clk),
 				 .input_state(state),
-				 .input_pad(pad_len),				//<--------- again for testing purpose ---------------->
 				 .message_size(message_size),
 				 .padding_length(padding_length)
 				 );
@@ -100,47 +92,31 @@ SHA1_read_from_mem read_from_mem(
 				 .port_A_clk(port_A_clk),
 				 .message_size(message_size),
 				 .port_A_data_out(port_A_data_out),
-				 /*.in_h0(new_h0),
-				 .in_h1(new_h1),
-				 .in_h2(new_h2),
-				 .in_h3(new_h3),
-				 .in_h4(new_h4),*/
 				 .output_data(output_data),
 				 .padding_length(padding_length),
 				 .port_A_addr(port_A_addr),
 				 .round(round),
 				 .compute_enable(compute_en),
 				 .finish(finish)
-				 //.hash(hash)
 				 );
-
-//computes the alg
+				 
 SHA1_alg alg(
-		 .state(state),
-		 .clk(clk),
-		 .input_data(output_data),
-		 .round(round),
-		 .compute_enable(compute_en),
-		/* .out_h0(new_h0),
-		 .out_h1(new_h1),
-		 .out_h2(new_h2),
-		 .out_h3(new_h3),
-		 .out_h4(new_h4),*/
-		 .out(hash)
-		);
-		 
-		 
-SHA1_finish fin(
+				.state(state),
 				.clk(clk),
-				.state(state), 
-				/*.in_h0(new_h0),
-				.in_h1(new_h1),
-				.in_h2(new_h2),
-				.in_h3(new_h3),
-				.in_h4(new_h4),*/
-				.complete(done)
-	//			.result(hash)
+				.input_data(output_data),
+				.round(round),
+				.compute_enable(compute_en),
+				.second_half(sec_part),
+				.output_round(output_round),
+				.part2_enable(p2_enable)
 );
 
+SHA1_alg_part2 p2(
+					.clk(clk),
+					.second_half(sec_part),
+					.in_round(output_round),
+					.enable(p2_enable),
+					.out(hash)
+);
 
 endmodule 

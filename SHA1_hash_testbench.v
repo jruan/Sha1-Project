@@ -60,11 +60,13 @@ reg     [ 31:0] temp_tb;
 reg     [ 31:0] dpsram_test[0:16383]; // for result testing, testbench only
 reg     [ 31:0] w_tb[0:79];
 
-reg 		[31:0] a[0:79];
-reg 		[31:0] b[0:79];
-reg 		[31:0] c[0:79];
-reg 		[31:0] d[0:79];
-reg 		[31:0] e[0:79];
+reg 		[31:0] a[79:0];
+reg 		[31:0] b[79:0];
+reg 		[31:0] c[79:0];
+reg 		[31:0] d[79:0];
+reg 		[31:0] e[79:0];
+
+reg		[159:0] hash_a[2:0];
 
 SHA1_hash SHA1_inst (
     .clk             (clk),
@@ -193,11 +195,13 @@ begin
             b_tb = a_tb;
             a_tb = temp_tb;
 				
+				if(k == 0)begin
 				a[i] = a_tb;
 				b[i] = b_tb;
 				c[i] = c_tb;
 				d[i] = d_tb;
 				e[i] = e_tb;
+				end
         end
 
         h0_tb = h0_tb + a_tb;
@@ -205,6 +209,10 @@ begin
         h2_tb = h2_tb + c_tb;
         h3_tb = h3_tb + d_tb;
         h4_tb = h4_tb + e_tb;
+		  
+		  if(k == 0)begin
+				hash_a[0] = {h0_tb, h1_tb, h2_tb, h3_tb, h4_tb};
+		  end
     end
 
     digest_tb = { h0_tb, h1_tb, h2_tb, h3_tb, h4_tb };
