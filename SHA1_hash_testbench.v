@@ -27,7 +27,7 @@ integer         j;
 integer         outloop;
 integer         cycles;
 
-integer         message_length = 54; // in bytes // change this number to test your design
+integer         message_length = 120; // in bytes // change this number to test your design
 integer         pad_length;
 
 wire            port_A_clk;
@@ -68,7 +68,7 @@ reg 		[31:0] e[79:0];
 
 reg		[159:0] hash_a[2:0];
 
-SHA1_hash SHA1_inst (
+SHA1_hash_interface SHA1_inst (
     .clk             (clk),
     .nreset          (nreset),
     .start_hash      (start_hash[0]),

@@ -1,4 +1,4 @@
-module SHA1_hash (       
+module SHA1_hash_interface (       
 			clk, 		
 			nreset, 	
 			start_hash,  
@@ -66,6 +66,17 @@ wire p2_enable;
 wire [31:0] output_data;
 wire [7:0] output_round;
 
+wire [31:0] bytes_read;
+
+wire port;
+wire zero;
+wire upper_32;
+wire lower_32;
+wire concat_one;
+
+wire [15:0] message_address;
+wire read_en;
+
 assign done = finish;
 
 
@@ -85,16 +96,42 @@ SHA1_initial_state initial_state(
 				 .padding_length(padding_length)
 				 );
 				 
+SHA1_construct_packet construct(
+				.clk(clk),
+				.state(state),
+				.bytes_read(bytes_read),
+				.message_size(message_size),
+				.port_A_clk(port_A_clk),
+				.padding_length(padding_length),
+				.message_addr(message_address),
+				.port_A_addr(port_A_addr),
+				.port(port),
+				.zero(zero),
+				.upper_32(upper_32),
+				.lower_32(lower_32),
+				.concat_one(concat_one),
+				.read_en(read_en)
+				);
+				 
 //read from mem will be our round incrementer and also where we read from mem and padd up
 SHA1_read_from_mem read_from_mem(
 				 .state(state),
 				 .clk(clk),
-				 .port_A_clk(port_A_clk),
+				 .port(port),
+				 .zero(zero),
+				 .upper_32(upper_32),
+				 .lower_32(lower_32),
+				 .concat_one(concat_one),
 				 .message_size(message_size),
+				 .read_en(read_en),
+				 .padding_length(padding_length),
+			//	 .port_A_clk(port_A_clk),
+				// .message_size(message_size),
 				 .port_A_data_out(port_A_data_out),
 				 .output_data(output_data),
-				 .padding_length(padding_length),
-				 .port_A_addr(port_A_addr),
+				 .message_addr(message_address),
+				 .bytes_read(bytes_read),
+				// .port_A_addr(port_A_addr),
 				 .round(round),
 				 .compute_enable(compute_en),
 				 .finish(finish)

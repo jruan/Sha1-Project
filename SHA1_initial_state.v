@@ -1,4 +1,4 @@
-module SHA1_initial_state(
+	module SHA1_initial_state(
 				 clk,
 				 input_state,
 				 message_size,
