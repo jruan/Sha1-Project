@@ -125,13 +125,10 @@ SHA1_read_from_mem read_from_mem(
 				 .message_size(message_size),
 				 .read_en(read_en),
 				 .padding_length(padding_length),
-			//	 .port_A_clk(port_A_clk),
-				// .message_size(message_size),
 				 .port_A_data_out(port_A_data_out),
 				 .output_data(output_data),
 				 .message_addr(message_address),
 				 .bytes_read(bytes_read),
-				// .port_A_addr(port_A_addr),
 				 .round(round),
 				 .compute_enable(compute_en),
 				 .finish(finish)
